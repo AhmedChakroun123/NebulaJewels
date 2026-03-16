@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#020818">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Nebula Jewels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- AMBIENT BACKGROUND -->
+<div id="nebula-bg">
+  <div class="nebula-layer n1"></div>
+  <div class="nebula-layer n2"></div>
+  <div class="nebula-layer n3"></div>
+</div>
+<canvas id="starfield-canvas"></canvas>
+<canvas id="particle-canvas"></canvas>
+
+<!-- ══ MAIN MENU ══ -->
+<div class="screen active" id="screen-menu">
+  <div class="menu-container">
+    <div class="logo-wrap">
+      <div class="logo-gems" id="logo-gems"></div>
+      <h1 class="logo-title">NEBULA<br><span>JEWELS</span></h1>
+      <p class="logo-sub">∞ DEEP SPACE PUZZLE ∞</p>
+    </div>
+    <nav class="menu-nav glass-panel">
+      <button class="btn btn-primary" id="btn-play">
+        <span class="btn-icon">▶</span>
+        <span>PLAY</span>
+      </button>
+      <button class="btn btn-secondary" id="btn-continue" style="display:none">
+        <span class="btn-icon">⚡</span>
+        <span>CONTINUE</span>
+      </button>
+      <button class="btn btn-ghost" id="btn-howto">
+        <span class="btn-icon">◈</span>
+        <span>HOW TO PLAY</span>
+      </button>
+      <button class="btn btn-ghost" id="btn-settings">
+        <span class="btn-icon">⚙</span>
+        <span>SETTINGS</span>
+      </button>
+    </nav>
+    <div class="menu-footer">
+      <span class="version-tag">v3.0 · 300+ LEVELS</span>
+      <div id="total-stars-display" class="total-stars"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STAR MAP ══ -->
+<div class="screen" id="screen-starmap">
+  <div class="starmap-header">
+    <button class="icon-btn" id="btn-map-back">←</button>
+    <div class="starmap-title-wrap">
+      <h2 class="starmap-title">STAR MAP</h2>
+      <span class="starmap-chapter" id="chapter-label">SECTOR ALPHA</span>
+    </div>
+    <div class="chapter-nav">
+      <button class="icon-btn" id="btn-chapter-prev">‹</button>
+      <button class="icon-btn" id="btn-chapter-next">›</button>
+    </div>
+  </div>
+  <div class="chapter-strip" id="chapter-strip"></div>
+  <div class="starmap-scroll-wrap">
+    <div class="starmap-grid" id="starmap-grid"></div>
+  </div>
+</div>
+
+<!-- ══ GAME SCREEN ══ -->
+<div class="screen" id="screen-game">
+  <div class="game-header">
+    <button class="icon-btn" id="btn-pause">☰</button>
+    <div class="hud-score-wrap">
+      <div class="hud-level-lbl" id="hud-level">LEVEL 1</div>
+      <div class="hud-score" id="hud-score">0</div>
+      <div class="hud-goal-bar">
+        <div class="hud-goal-fill" id="hud-goal-fill"></div>
+        <span class="hud-goal-txt" id="hud-goal-txt"></span>
+      </div>
+    </div>
+    <div class="hud-moves-wrap">
+      <span class="hud-moves-num" id="hud-moves">30</span>
+      <span class="hud-moves-lbl">MOVES</span>
+    </div>
+  </div>
+
+  <div class="powerups-bar" id="powerups-bar">
+    <button class="powerup-btn" data-pu="hammer" title="Gem Hammer">🔨<span>3</span></button>
+    <button class="powerup-btn" data-pu="shuffle" title="Shuffle">🌀<span>2</span></button>
+    <button class="powerup-btn" data-pu="lightning" title="Lightning Row">⚡<span>1</span></button>
+  </div>
+
+  <div class="board-outer" id="board-outer">
+    <canvas id="game-canvas"></canvas>
+    <div id="tutorial-hint" class="tutorial-hint"></div>
+  </div>
+
+  <div class="combo-bar" id="combo-bar">
+    <div class="combo-fill" id="combo-fill"></div>
+  </div>
+</div>
+
+<!-- ══ OVERLAYS ══ -->
+<div class="overlay" id="overlay-win">
+  <div class="overlay-card glass-panel">
+    <div class="overlay-sparkles" id="win-sparkles"></div>
+    <div class="overlay-icon win-icon">🌟</div>
+    <h2 class="overlay-title gold-text">LEVEL CLEAR!</h2>
+    <div class="stars-row" id="win-stars-row"></div>
+    <div class="win-stats" id="win-stats"></div>
+    <div class="overlay-btns">
+      <button class="btn btn-primary" id="btn-next-level">NEXT ▶</button>
+      <button class="btn btn-ghost" id="btn-replay-win">↺ REPLAY</button>
+      <button class="btn btn-ghost" id="btn-map-from-win">MAP</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-lose">
+  <div class="overlay-card glass-panel">
+    <div class="overlay-icon">💀</div>
+    <h2 class="overlay-title pink-text">OUT OF MOVES</h2>
+    <p class="overlay-sub">Score: <strong id="lose-score">0</strong></p>
+    <p class="overlay-sub" id="lose-hint"></p>
+    <div class="overlay-btns">
+      <button class="btn btn-primary" id="btn-replay-lose">↺ TRY AGAIN</button>
+      <button class="btn btn-ghost" id="btn-map-from-lose">← MAP</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-pause">
+  <div class="overlay-card glass-panel">
+    <div class="overlay-icon">⏸</div>
+    <h2 class="overlay-title cyan-text">PAUSED</h2>
+    <div class="overlay-btns">
+      <button class="btn btn-primary" id="btn-resume">▶ RESUME</button>
+      <button class="btn btn-ghost" id="btn-restart">↺ RESTART</button>
+      <button class="btn btn-ghost" id="btn-pause-map">← MAP</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-howto">
+  <div class="overlay-card glass-panel howto-card">
+    <h2 class="overlay-title cyan-text">HOW TO PLAY</h2>
+    <div class="howto-steps">
+      <div class="howto-step"><span class="step-icon">💎</span><span>Swap adjacent gems to match 3 or more in a row</span></div>
+      <div class="howto-step"><span class="step-icon">⚡</span><span>Match 4 gems → Line Blast · Match 5 → Rainbow Gem</span></div>
+      <div class="howto-step"><span class="step-icon">🔥</span><span>Chain combos for explosive score multipliers</span></div>
+      <div class="howto-step"><span class="step-icon">🌀</span><span>Match an L/T shape → Bomb (3×3 blast)</span></div>
+      <div class="howto-step"><span class="step-icon">⭐</span><span>Hit the score goal before moves run out</span></div>
+      <div class="howto-step"><span class="step-icon">💾</span><span>Progress auto-saved — earn up to 3 stars per level</span></div>
+    </div>
+    <button class="btn btn-primary" id="btn-howto-close">GOT IT!</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-settings">
+  <div class="overlay-card glass-panel">
+    <h2 class="overlay-title cyan-text">SETTINGS</h2>
+    <div class="settings-list">
+      <label class="setting-row"><span>Sound Effects</span><input type="checkbox" id="snd-toggle" checked><div class="toggle-track"></div></label>
+      <label class="setting-row"><span>Haptics</span><input type="checkbox" id="hap-toggle" checked><div class="toggle-track"></div></label>
+      <label class="setting-row"><span>Particles</span><input type="checkbox" id="part-toggle" checked><div class="toggle-track"></div></label>
+      <label class="setting-row"><span>Show Hints</span><input type="checkbox" id="hint-toggle" checked><div class="toggle-track"></div></label>
+    </div>
+    <button class="btn btn-danger" id="btn-reset-save">⚠ RESET ALL PROGRESS</button>
+    <button class="btn btn-primary" id="btn-settings-close" style="margin-top:8px">CLOSE</button>
+  </div>
+</div>
+
+<!-- COMBO POPUP -->
+<div id="combo-popup" class="combo-popup"></div>
+
+<script src="levels.js"></script>
+<script src="audio.js"></script>
+<script src="particles.js"></script>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>
